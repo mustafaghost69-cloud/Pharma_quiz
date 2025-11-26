@@ -6,24 +6,42 @@
 <title>Pharma Quiz</title>
 <style>
 body { font-family: Arial; background:#f6f6f6; padding:20px; }
-.container { background:white; padding:20px; border-radius:10px; max-width:400px; margin:auto; text-align:center; }
-button { padding:10px 20px; margin:10px; font-size:18px; }
-#timer { font-size:22px; margin-bottom:15px; }
+.container { background:white; padding:20px; border-radius:10px; max-width:500px; margin:auto; padding:20px; }
+#layout { display:flex; justify-content:space-between; }
+#leftPanel { width:120px; text-align:center; }
+#timer { font-size:22px; margin-bottom:10px; }
+#score { font-size:18px; line-height:1.8; }
+#questionBox { flex-grow:1; text-align:center; }
+button { padding:10px 20px; margin:10px; font-size:18px; cursor:pointer; }
+.correctBtn { background:#27ae60; color:white; }
+.wrongBtn { background:#c0392b; color:white; }
 </style>
 </head>
 <body>
 
 <div class="container">
-<h2>Pharma Quiz</h2>
-<div id="timer">الوقت: 10</div>
-<div id="question">اضغط ابدأ لبدء الاختبار</div>
+<h2 style="text-align:center;">Pharma Quiz</h2>
 
-<button id="startBtn" onclick="startQuiz()">ابدأ</button>
-<button id="nextBtn" style="display:none;" onclick="nextQuestion()">تم</button>
+<div id="layout">
+  <div id="leftPanel">
+    <div id="timer">الوقت: 10</div>
+    <div id="score">
+      صح: <span id="correctCount">0</span><br>
+      خطأ: <span id="wrongCount">0</span>
+    </div>
+  </div>
 
-<div id="judge" style="display:none;">
-<button onclick="correct()">صح</button>
-<button onclick="wrong()">خطأ</button>
+  <div id="questionBox">
+    <div id="question">اضغط ابدأ لبدء الاختبار</div>
+
+    <button id="startBtn" onclick="startQuiz()">ابدأ</button>
+    <button id="nextBtn" style="display:none;" onclick="finishThinking()">تم</button>
+
+    <div id="judge" style="display:none;">
+      <button class="correctBtn" onclick="markCorrect()">صح</button>
+      <button class="wrongBtn" onclick="markWrong()">خطأ</button>
+    </div>
+  </div>
 </div>
 
 </div>
@@ -37,50 +55,72 @@ let questions = [
 "Rabital","Rabital H","Vivazac"
 ];
 
-let current = -1;
-let timeLeft = 10;
+// randomize questions
+questions = questions.sort(() => Math.random() - 0.5);
+
+let index = -1;
 let timer;
+let timeLeft = 10;
+let correctCount = 0;
+let wrongCount = 0;
 
 function startQuiz(){
- document.getElementById("startBtn").style.display="none";
+ document.getElementById("startBtn").style.display = "none";
  nextQuestion();
 }
 
 function nextQuestion(){
- current++;
- if(current >= questions.length){
+ index++;
+ if(index >= questions.length){
    document.getElementById("question").innerHTML = "انتهى الاختبار";
    document.getElementById("nextBtn").style.display="none";
    document.getElementById("judge").style.display="none";
    clearInterval(timer);
    return;
  }
- document.getElementById("question").innerHTML = questions[current];
+ document.getElementById("question").innerHTML = questions[index];
  document.getElementById("nextBtn").style.display="inline-block";
  document.getElementById("judge").style.display="none";
  resetTimer();
 }
 
 function resetTimer(){
+ clearInterval(timer);
  timeLeft = 10;
  document.getElementById("timer").innerHTML = "الوقت: " + timeLeft;
- clearInterval(timer);
+
  timer = setInterval(()=>{
    timeLeft--;
    document.getElementById("timer").innerHTML = "الوقت: " + timeLeft;
+
    if(timeLeft <= 0){
      clearInterval(timer);
-     document.getElementById("judge").style.display="block";
-     document.getElementById("nextBtn").style.display="none";
+     showJudge();
    }
  },1000);
 }
 
-function correct(){
+function finishThinking(){
+ clearInterval(timer);
+ showJudge();
+}
+
+function showJudge(){
+ document.getElementById("nextBtn").style.display="none";
+ document.getElementById("judge").style.display="block";
+}
+
+function markCorrect(){
+ correctCount++;
+ document.getElementById("correctCount").innerHTML = correctCount;
+ document.getElementById("judge").style.display="none";
  nextQuestion();
 }
 
-function wrong(){
+function markWrong(){
+ wrongCount++;
+ document.getElementById("wrongCount").innerHTML = wrongCount;
+ document.getElementById("judge").style.display="none";
  nextQuestion();
 }
 </script>
